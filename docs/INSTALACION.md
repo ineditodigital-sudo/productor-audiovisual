@@ -23,6 +23,8 @@ Descarga de la carpeta de Drive (https://drive.google.com/drive/folders/1ERIAAfr
 - `biblioteca_megafono-halftone-secuencia.zip` — megáfono en halftone con alpha (secuencia PNG).
 - `biblioteca_clips-tomas-reales.zip` — 4 tomas realistas 9:16 (scroll aburrido, scroll rápido, producción de contenido, alguien que se detiene).
 - `ejemplo_inedito_assets.zip` — objetos, logos y clips para correr los 3 reels de ejemplo.
+- `ejemplo_inedito_referencias-y-decorativos.zip` — carrusel de referencia, manual de identidad y formas decorativas de la marca de ejemplo.
+- `ejemplo_inedito_originales-nano-banana.zip` — imágenes originales sobre verde (antes del recorte) + el JSON de prompts: muestra el proceso completo de generar → recortar.
 
 ## 3. After Effects
 - *Edit > Preferences > Scripting & Expressions*: activar **Allow Scripts to Write Files and Access Network**.
