@@ -1,0 +1,126 @@
+diff --git a/src/browser.ts b/src/browser.ts
+index 324148e..9ec53a0 100644
+--- a/src/browser.ts
++++ b/src/browser.ts
+@@ -50,10 +50,11 @@ export class FlowBrowser {
+       executablePath: opts.executablePath,
+       headless: false,
+       viewport: null,
+-      args: ['--disable-blink-features=AutomationControlled'],
++      locale: 'en-US',
++        args: ['--disable-blink-features=AutomationControlled', '--lang=en-US'],
+     });
+     const page = this.context.pages()[0] ?? (await this.context.newPage());
+-    await page.goto(FLOW_ORIGIN + '/', { waitUntil: 'domcontentloaded' });
++    await page.goto(FLOW_ORIGIN + '/?hl=en', { waitUntil: 'domcontentloaded' });
+     this.page = page;
+     return page;
+   }
+@@ -69,13 +70,14 @@ export class FlowBrowser {
+         executablePath: this.opts.executablePath,
+         headless: this.opts.headless,
+         viewport: null,
+-        args: ['--disable-blink-features=AutomationControlled'],
++        locale: 'en-US',
++        args: ['--disable-blink-features=AutomationControlled', '--lang=en-US'],
+       });
+     }
+     // Reuse an open Flow tab if there is one (CDP mode), else open our own.
+     const existing = this.context.pages().find((p) => p.url().startsWith(FLOW_ORIGIN));
+     const page = existing ?? (await this.context.newPage());
+-    if (!existing) await page.goto(FLOW_ORIGIN + '/', { waitUntil: 'domcontentloaded' });
++    if (!existing) await page.goto(FLOW_ORIGIN + '/?hl=en', { waitUntil: 'domcontentloaded' });
+     page.on('close', () => { if (this.page === page) this.page = undefined; });
+     this.page = page;
+     return page;
+@@ -89,7 +91,7 @@ export class FlowBrowser {
+       page = await this.connecting;
+     }
+     if (!page.url().startsWith(FLOW_ORIGIN)) {
+-      await page.goto(FLOW_ORIGIN + '/', { waitUntil: 'domcontentloaded' });
++      await page.goto(FLOW_ORIGIN + '/?hl=en', { waitUntil: 'domcontentloaded' });
+     }
+     if (page.url().includes('accounts.google.com') || page.url().includes('/about')) {
+       throw new Error(
+diff --git a/src/flow.ts b/src/flow.ts
+index f86c6d7..8f2e70c 100644
+--- a/src/flow.ts
++++ b/src/flow.ts
+@@ -178,13 +178,13 @@ export class FlowClient {
+ 
+   // -------------------------------------------------------------- images
+ 
+-  async generateImages(o: { projectId: string; prompt: string; aspect: P.ImageAspect; count: number; referenceMediaIds?: string[]; characterIds?: string[] }) {
++  async generateImages(o: { projectId: string; prompt: string; aspect: P.ImageAspect; count: number; model?: string; referenceMediaIds?: string[]; characterIds?: string[] }) {
+     const ingredients = await this.ingredientNames(o.projectId, { characterIds: o.characterIds, imageIds: o.referenceMediaIds });
+     return this.withUi(async (ui) => {
+       await ui.openProject(o.projectId);
+       await ui.setMode('manual');
+       await ui.clearPrompt();
+-      await ui.configure({ kind: 'image', aspect: o.aspect, count: o.count });
++      await ui.configure({ kind: 'image', aspect: o.aspect, count: o.count, model: o.model });
+       for (const i of ingredients) await ui.addIngredient(i.name, i.kind);
+       await ui.typePrompt(o.prompt);
+       const res = await ui.submitGeneration(120_000);
+diff --git a/src/index.ts b/src/index.ts
+index dddc54e..3a13f29 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -120,9 +120,10 @@ server.registerTool('flow_generate_image', {
+     project_id: projectId, prompt: z.string(), aspect: imageAspect.default('16:9'),
+     count: z.number().int().min(1).max(4).default(1),
+     character_ids: z.array(z.string()).optional(), reference_media_ids: z.array(z.string()).optional(),
++    model: z.string().optional().describe('Image model display name, e.g. "Nano Banana Pro" or "Nano Banana 2". Omit to keep the current composer model.'),
+   },
+-}, wrap(({ project_id, prompt, aspect, count, character_ids, reference_media_ids }) =>
+-  flow.generateImages({ projectId: project_id, prompt, aspect, count, characterIds: character_ids, referenceMediaIds: reference_media_ids })));
++}, wrap(({ project_id, prompt, aspect, count, character_ids, reference_media_ids, model }) =>
++  flow.generateImages({ projectId: project_id, prompt, aspect, count, model, characterIds: character_ids, referenceMediaIds: reference_media_ids })));
+ 
+ // ------------------------------------------------------------------ video
+ 
+diff --git a/src/ui.ts b/src/ui.ts
+index 67ffea9..5c9c1c7 100644
+--- a/src/ui.ts
++++ b/src/ui.ts
+@@ -62,8 +62,10 @@ export class FlowUi {
+ 
+   async openProject(projectId: string, sub = '') {
+     const target = `/project/${projectId}${sub}`;
+-    if (new URL(this.page.url()).pathname !== target) {
+-      await this.page.goto('https://flow.google.com' + target, { waitUntil: 'domcontentloaded' });
++    const cur = new URL(this.page.url());
++    if (cur.pathname !== target || cur.searchParams.get('hl') !== 'en') {
++      // hl=en: la cuenta puede tener la interfaz en español y los selectores son en inglés
++      await this.page.goto('https://flow.google.com' + target + '?hl=en', { waitUntil: 'domcontentloaded' });
+     }
+     await this.generateButton().waitFor({ state: 'visible', timeout: 30_000 });
+     await this.page.waitForTimeout(800);
+@@ -173,16 +175,22 @@ export class FlowUi {
+       await this.clickText(`^${icon[s.aspect]} ${esc(s.aspect)}$`, `aspect ${s.aspect}`);
+     }
+     if (s.model) {
+-      const current = await this.page.getByText(/arrow_drop_down/).filter({ visible: true } as any).first().textContent().catch(() => '');
+-      if (!current?.includes(s.model)) {
++      // ¿el disparador del menú de modelos ya muestra este modelo? (antes leía el primer "arrow_drop_down" visible, que puede ser otro control)
++      const already = await this.page.evaluate((m) => {
++        const txt = (e: Element) => ((e as HTMLElement).innerText || '').trim().replace(/\s+/g, ' ');
++        return [...document.querySelectorAll('button, div, span')].some((e) => (e as HTMLElement).offsetParent && /arrow_drop_down$/.test(txt(e)) && txt(e).replace(/arrow_drop_down$/, '').replace(/^(volume_up |🍌 )/, '').trim() === m);
++      }, s.model).catch(() => false);
++      if (!already) {
+         await this.clickText('^(🍌 )?[A-Za-z].* arrow_drop_down$', 'model menu');
+         await this.clickText(`^(volume_up )?(🍌 )?${esc(s.model)}$`, `model "${s.model}"`);
+         await this.page.waitForTimeout(600);
+       }
+     }
+-    if (s.resolution) await this.clickText(`^${esc(s.resolution)}$`, `resolution ${s.resolution} for ${s.model ?? 'this model'}`);
+-    if (s.durationSec) await this.clickText(`^${s.durationSec}s$`, `${s.durationSec}s duration for ${s.model ?? 'this model'}`);
+-    if (s.count) await this.clickText(`^x${s.count}$`, `count x${s.count}`);
++    // reabrir el menú antes de cada clic: si una opción ya estaba elegida, el clic puede cerrar el menú
++    if (s.resolution) { await this.openSettings(); await this.clickText(`^${esc(s.resolution)}$`, `resolution ${s.resolution} for ${s.model ?? 'this model'}`); }
++    if (s.durationSec) { await this.openSettings(); await this.clickText(`^${s.durationSec}s$`, `${s.durationSec}s duration for ${s.model ?? 'this model'}`); }
++    if (s.count) { await this.openSettings(); await this.clickText(`^x${s.count}$`, `count x${s.count}`); }
++    await this.openSettings();
+     await this.page.waitForTimeout(500);
+     const quote = await this.readQuote();
+     await this.closeSettings();

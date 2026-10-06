@@ -1,0 +1,33 @@
+# dependencias
+node_modules/
+
+# clientes reales: solo se versionan la plantilla y el ejemplo
+clientes/*
+!clientes/_PLANTILLA/
+!clientes/INEDITO/
+clientes/INEDITO/03_assets/**/*.png
+clientes/INEDITO/03_assets/**/*.jpg
+clientes/INEDITO/03_assets/**/*.svg
+clientes/INEDITO/04_clips/**/*.mp4
+clientes/INEDITO/05_proyectos-ae/*.aep
+clientes/INEDITO/06_exports/**/*.mp4
+
+# medios pesados de la biblioteca (se descargan de Drive)
+_biblioteca/**/*.mp4
+_biblioteca/**/*.mov
+_biblioteca/**/*.png
+_biblioteca/**/*.jpg
+_biblioteca/**/*.wav
+_biblioteca/**/*.mp3
+_biblioteca/**/*.cube
+
+# AE y temporales
+*.aep
+*.aep.lck
+Adobe After Effects Auto-Save/
+_versiones/
+*_check.png
+*.tmp
+.DS_Store
+Thumbs.db
+estado.json

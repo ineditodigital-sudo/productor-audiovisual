@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ae-bridge": {
+      "command": "node",
+      "args": ["mcp/ae-bridge/iniciar.js"]
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+ "project": "<id-de-tu-proyecto-en-flow>",
+ "jobs": [
+  {
+   "name": "cursor",
+   "prompt": "A single complete 3D computer mouse pointer arrow, glossy matte black body with a thin polished silver chrome bevel edge, slightly tilted three-quarter view, entire object visible, floating in empty space with no ground, no floor, no base, no plinth, no shadow beneath it, centered with generous margin around it, not cropped, not touching the edges of the frame, sharp defined edges, clean crisp silhouette, soft studio key light from top left with a subtle deep purple (#5C3D91) rim light, premium 3D product render, high detail, isolated on a perfectly flat uniform pure chroma green (#00FF00) background, no gradient, no reflections of green on the object.",
+   "aspect": "1:1",
+   "model": "keep"
+  },
+  {
+   "name": "burbuja-chat",
+   "prompt": "A single complete 3D chat speech bubble icon, rounded soft pillow shape with a small tail at the bottom left, glossy deep purple (#5C3D91) material with a soft inner glow, three white dots on its front face, slightly tilted three-quarter view, entire object visible, floating in empty space with no ground, no floor, no base, no plinth, no shadow beneath it, centered with generous margin around it, not cropped, not touching the edges of the frame, sharp defined edges, clean crisp silhouette, soft studio key light from top left, subtle white rim light, premium 3D product render, high detail, isolated on a perfectly flat uniform pure chroma green (#00FF00) background, no gradient, no reflections of green on the object.",
+   "aspect": "1:1",
+   "model": "keep"
+  },
+  {
+   "name": "numero-1",
+   "prompt": "A single complete 3D numeral one (the digit 1), bold geometric sans serif, thick extruded, polished chrome silver with deep purple (#5C3D91) reflections, slightly rotated three-quarter view, entire object visible, floating in empty space with no ground, no floor, no base, no plinth, no shadow beneath it, centered with generous margin around it, not cropped, not touching the edges of the frame, sharp defined edges, clean crisp silhouette, dramatic studio light from top right with a deep purple (#5C3D91) rim light, premium 3D product render, high detail, isolated on a perfectly flat uniform pure chroma green (#00FF00) background, no gradient, no reflections of green on the object.",
+   "aspect": "1:1",
+   "model": "keep"
+  },
+  {
+   "name": "lupa",
+   "prompt": "A single complete 3D magnifying glass, polished chrome silver ring and matte black handle, clear glass lens, slightly tilted three-quarter view, entire object visible, floating in empty space with no ground, no floor, no base, no plinth, no shadow beneath it, centered with generous margin around it, not cropped, not touching the edges of the frame, sharp defined edges, clean crisp silhouette, soft studio key light from top left with a subtle deep purple (#5C3D91) rim light, premium 3D product render, high detail, isolated on a perfectly flat uniform pure chroma green (#00FF00) background, no gradient, no reflections of green on the object.",
+   "aspect": "1:1",
+   "model": "keep"
+  },
+  {
+   "name": "papel-arrugado",
+   "prompt": "A single complete crumpled sheet of plain white paper, loosely crumpled ball with soft folds, no printing, no text, entire object visible, floating in empty space with no ground, no floor, no base, no plinth, no shadow beneath it, centered with generous margin around it, not cropped, not touching the edges of the frame, sharp defined edges, clean crisp silhouette, soft neutral studio light from top left, premium 3D product render, high detail, isolated on a perfectly flat uniform pure chroma green (#00FF00) background, no gradient, no reflections of green on the object.",
+   "aspect": "1:1",
+   "model": "keep"
+  },
+  {
+   "name": "web-foto-interior",
+   "aspect": "16:9",
+   "prompt": "Photograph of an elegant modern business interior, premium minimalist design, dark charcoal and warm grey tones with a subtle deep purple (#5C3D91) accent light, shallow depth of field, no people, no text, no logos, no signage, editorial architectural photography, high detail",
+   "model": "keep"
+  },
+  {
+   "name": "web-foto-producto",
+   "aspect": "16:9",
+   "prompt": "Photograph of an elegant premium still life on a dark charcoal surface, abstract minimal objects (matte black sphere, brushed silver cylinder), soft dramatic light with a subtle deep purple (#5C3D91) glow, generous empty space on the left side, no text, no logos, editorial product photography, high detail",
+   "model": "keep"
+  }
+ ]
+}
